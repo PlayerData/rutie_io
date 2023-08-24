@@ -58,26 +58,25 @@ impl std::io::Read for RubyIOBackend {
 
 impl std::io::Write for RubyIOBackend {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-        let result = self.protect_public_send(
+        let result = match self.protect_public_send(
             "write",
             &[RString::from_bytes(buf, &Encoding::utf8()).to_any_object()],
-        );
+        ) {
+            Ok(result) => result,
 
-        match result {
-            Ok(result) => {
-                let result = result.try_convert_to::<rutie::Integer>();
-
-                match result {
-                    Ok(result) => Ok(result.to_i64() as usize),
-                    Err(_) => Err(std::io::Error::new(
-                        std::io::ErrorKind::Other,
-                        "Failed to convert result to integer",
-                    )),
-                }
+            Err(e) => {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    format!("Failed to write to IO, ruby error {:?}", e),
+                ))
             }
-            Err(e) => Err(std::io::Error::new(
+        };
+
+        match result.try_convert_to::<rutie::Integer>() {
+            Ok(result) => Ok(result.to_i64() as usize),
+            Err(_) => Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
-                format!("Failed to write to IO, ruby error {:?}", e),
+                "Failed to convert result to integer",
             )),
         }
     }
