@@ -1,4 +1,6 @@
-use rutie::{class, methods, AnyException, AnyObject, Class, Exception, NilClass, Object, VM};
+use rutie::{
+    class, methods, AnyException, AnyObject, Class, Exception, NilClass, Object, RString, VM,
+};
 use rutie_io::RubyIOBackend;
 
 use std::io::{Read, Write};
@@ -53,10 +55,33 @@ methods!(
     }
 );
 
+methods!(
+    RutieIOExample,
+    _rtself,
+    fn read_char(input_io: AnyObject) -> RString {
+        let Ok(mut input_io) = input_io
+            .unwrap_or_else(raise_error("ArgumentError"))
+            .try_convert_to::<RubyIOBackend>()
+        else {
+            VM::raise_ex(AnyException::new(
+                "ArgumentError",
+                Some("First argument was not StringIO or a subclass of IO"),
+            ));
+            unreachable!();
+        };
+
+        let mut input = [0; 1];
+
+        let len = input_io.read(&mut input).unwrap_or(0);
+        RString::new_utf8(std::str::from_utf8(&input[0..len]).unwrap())
+    }
+);
+
 #[allow(non_snake_case)]
 #[no_mangle]
 pub extern "C" fn Init_rutie_io_example() {
     Class::new("RutieIOExample", None).define(|klass| {
         klass.def_self("echo", echo);
+        klass.def_self("read_char", read_char);
     });
 }

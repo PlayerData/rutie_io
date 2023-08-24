@@ -1,4 +1,4 @@
-use rutie::{class, Encoding, Object, RString, VerifiedObject};
+use rutie::{class, Encoding, Integer, Object, RString, VerifiedObject};
 
 class!(RubyIOBackend);
 
@@ -18,7 +18,8 @@ impl VerifiedObject for RubyIOBackend {
 
 impl std::io::Read for RubyIOBackend {
     fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
-        let result = match self.protect_public_send("read", &[]) {
+        let read_size = Integer::from(buf.len() as u32).to_any_object();
+        let result = match self.protect_public_send("read", &[read_size]) {
             Ok(result) => result,
 
             Err(e) => {

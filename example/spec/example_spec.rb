@@ -28,4 +28,21 @@ RSpec.describe RutieIOExample do
       end
     end
   end
+
+  it 'can read single char' do
+      string_io_in = StringIO.new("Hello World")
+
+      char = RutieIOExample.read_char(string_io_in)
+      expect(char).to eq "H"
+      char = RutieIOExample.read_char(string_io_in)
+      expect(char).to eq "e"
+
+      string_io_in.rewind
+      char = RutieIOExample.read_char(string_io_in)
+      expect(char).to eq "H"
+
+      string_io_in.seek(20)
+      char = RutieIOExample.read_char(string_io_in)
+      expect(char).to eq ""
+  end
 end

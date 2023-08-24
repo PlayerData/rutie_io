@@ -2,3 +2,5 @@ target
 
 *.bundle
 *.so
+
+.idea
