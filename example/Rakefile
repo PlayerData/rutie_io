@@ -1,0 +1,10 @@
+require "rspec/core/rake_task"
+
+desc "Build rust sources for the current platform"
+task :cargo_build do
+  sh "cargo build --release --target-dir ./target"
+
+  sh "cp ./target/release/librutie_io_example.#{RbConfig::CONFIG['SOEXT']} rutie_io_example.#{RbConfig::CONFIG['DLEXT']}"
+end
+
+RSpec::Core::RakeTask.new(spec: [:cargo_build])

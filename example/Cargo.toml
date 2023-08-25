@@ -1,0 +1,16 @@
+[package]
+name = "rutie_io_example"
+version = "0.0.1"
+authors = ["PlayerData Engineering <dev@playerdata.com>"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rutie_io = { path = ".." }
+
+rutie = { version = "0.8.4" }
+
+[lib]
+name = "rutie_io_example"
+crate-type = ["cdylib"]
