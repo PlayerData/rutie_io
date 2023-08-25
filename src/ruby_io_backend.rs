@@ -1,4 +1,4 @@
-use rutie::{class, Encoding, Integer, Object, RString, VerifiedObject};
+use rutie::{class, AnyObject, Encoding, Integer, NilClass, Object, RString, VerifiedObject};
 
 class!(RubyIOBackend);
 
@@ -16,6 +16,18 @@ impl VerifiedObject for RubyIOBackend {
     }
 }
 
+fn get_class_name(object: AnyObject) -> Result<String, String> {
+    let class_name_object = object
+        .class()
+        .protect_public_send("name", &[])
+        .map_err(|e| format!("Couldnt request class name {:?}", e))?;
+
+    class_name_object
+        .try_convert_to::<RString>()
+        .map(|rstring| rstring.to_string())
+        .map_err(|e| format!("Couldnt convert class name to string {:?}", e))
+}
+
 impl std::io::Read for RubyIOBackend {
     fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
         let read_size = Integer::from(buf.len() as u32).to_any_object();
@@ -30,13 +42,21 @@ impl std::io::Read for RubyIOBackend {
             }
         };
 
+        if result.try_convert_to::<NilClass>().is_ok() {
+            return Ok(0);
+        }
+
         let string = match result.try_convert_to::<RString>() {
             Ok(result) => result,
 
             Err(e) => {
                 return Err(std::io::Error::new(
                     std::io::ErrorKind::Other,
-                    format!("Failed to convert ruby result to RString {:?}", e),
+                    format!(
+                        "Failed to convert ruby result to RString {:?} class was {:?}",
+                        e,
+                        get_class_name(result)
+                    ),
                 ))
             }
         };
