@@ -4,11 +4,17 @@ class!(RubyIOBackend);
 
 impl VerifiedObject for RubyIOBackend {
     fn is_correct_type<T: Object>(object: &T) -> bool {
+        let supported_parents = [
+            rutie::Class::from_existing("IO"),
+            rutie::Class::from_existing("StringIO"),
+            rutie::Class::from_existing("Tempfile"),
+        ];
+
         object
             .class()
             .ancestors()
-            .contains(&rutie::Class::from_existing("IO"))
-            || object.class() == rutie::Class::from_existing("StringIO")
+            .iter()
+            .any(|parent| supported_parents.contains(parent))
     }
 
     fn error_message() -> &'static str {
@@ -38,7 +44,7 @@ impl std::io::Read for RubyIOBackend {
                 return Err(std::io::Error::new(
                     std::io::ErrorKind::Other,
                     format!("Failed to read from IO, ruby error {:?}", e),
-                ))
+                ));
             }
         };
 
@@ -57,7 +63,7 @@ impl std::io::Read for RubyIOBackend {
                         e,
                         get_class_name(result)
                     ),
-                ))
+                ));
             }
         };
 
@@ -89,7 +95,7 @@ impl std::io::Write for RubyIOBackend {
                 return Err(std::io::Error::new(
                     std::io::ErrorKind::Other,
                     format!("Failed to write to IO, ruby error {:?}", e),
-                ))
+                ));
             }
         };
 
