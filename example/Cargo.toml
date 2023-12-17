@@ -9,7 +9,7 @@ edition = "2021"
 [dependencies]
 rutie_io = { path = ".." }
 
-rutie = { version = "0.8.4" }
+rutie = { version = "0.9.0" }
 
 [lib]
 name = "rutie_io_example"
