@@ -10,15 +10,15 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
-version = "0.2.147"
+version = "0.2.151"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b4668fb0ea861c1df094127ac5f1da3409a82116a4ba74fca2e58ef927159bb3"
+checksum = "302d7ab3130588088d277783b1e2d2e10c9e9e4a16dd9050e6ec93fb3e7048f4"
 
 [[package]]
 name = "rutie"
-version = "0.8.4"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d97db4cbb9739b48364c38cc9a6ebabdc07b42bd87b60ab448e1f29eaebb2ac"
+checksum = "e5e8e4f6480c30609e3480adfab87b8d4792525225a1caf98b371fbc9a7b698a"
 dependencies = [
  "lazy_static",
  "libc",
