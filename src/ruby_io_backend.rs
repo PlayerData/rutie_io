@@ -41,10 +41,10 @@ impl std::io::Read for RubyIOBackend {
             Ok(result) => result,
 
             Err(e) => {
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    format!("Failed to read from IO, ruby error {:?}", e),
-                ));
+                return Err(std::io::Error::other(format!(
+                    "Failed to read from IO, ruby error {:?}",
+                    e
+                )));
             }
         };
 
@@ -56,14 +56,11 @@ impl std::io::Read for RubyIOBackend {
             Ok(result) => result,
 
             Err(e) => {
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    format!(
-                        "Failed to convert ruby result to RString {:?} class was {:?}",
-                        e,
-                        get_class_name(result)
-                    ),
-                ));
+                return Err(std::io::Error::other(format!(
+                    "Failed to convert ruby result to RString {:?} class was {:?}",
+                    e,
+                    get_class_name(result)
+                )));
             }
         };
 
@@ -71,8 +68,7 @@ impl std::io::Read for RubyIOBackend {
         let bytes_len = bytes.len();
 
         if bytes_len > buf.len() {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
+            return Err(std::io::Error::other(
                 "Failed to read from IO, buffer too small",
             ));
         }
@@ -92,29 +88,26 @@ impl std::io::Write for RubyIOBackend {
             Ok(result) => result,
 
             Err(e) => {
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    format!("Failed to write to IO, ruby error {:?}", e),
-                ));
+                return Err(std::io::Error::other(format!(
+                    "Failed to write to IO, ruby error {:?}",
+                    e
+                )));
             }
         };
 
         match result.try_convert_to::<rutie::Integer>() {
             Ok(result) => Ok(result.to_i64() as usize),
-            Err(_) => Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                "Failed to convert result to integer",
-            )),
+            Err(_) => Err(std::io::Error::other("Failed to convert result to integer")),
         }
     }
 
     fn flush(&mut self) -> std::io::Result<()> {
         match self.protect_public_send("flush", &[]) {
             Ok(_) => Ok(()),
-            Err(e) => Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                format!("Failed to flush, ruby error {:?}", e),
-            )),
+            Err(e) => Err(std::io::Error::other(format!(
+                "Failed to flush, ruby error {:?}",
+                e
+            ))),
         }
     }
 }
